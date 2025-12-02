@@ -1,0 +1,481 @@
+:root {
+  --label-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --card-front-bg: #ffffff;
+  --card-back-bg: #0044aa;
+
+  --suit-color-hearts: #d32f2f;
+  --suit-color-diamonds: #e53935;
+  --suit-color-clubs: #1a237e;
+  --suit-color-spades: #000000;
+
+  --sheet-bg: #20232a;
+  --app-bg: #181a1f;
+  --panel-bg: #23252f;
+  --border-subtle: #383b47;
+  --text-main: #f5f5f5;
+  --text-muted: #a9a9b8;
+
+  --card-radius: 10px;
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+
+  /* Face frame settings (configurable) */
+  --face-frame-margin: 0px;
+  --face-frame-radius: 0px;
+
+  /* Card scale factor for fonts based on mm/DPI */
+  --card-scale: 1;
+
+  /* Font size configuration (in rem, before scaling) */
+  --corner-rank-font-rem: 6;
+  --center-ace-font-rem: 35;
+  --pip-font-rem: 10;
+
+  /* Card center sizing */
+  --center-inset-percent: 18%;
+}
+
+/* Layout */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top left, #2b2f3a 0, #111318 55%, #050608 100%);
+  color: var(--text-main);
+}
+
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Controls */
+
+.controls {
+  width: 340px;
+  max-width: 100%;
+  padding: 1.25rem 1.5rem 2rem;
+  background: linear-gradient(180deg, #23252f 0%, #171922 100%);
+  border-right: 1px solid var(--border-subtle);
+  overflow-y: auto;
+}
+
+.controls h1 {
+  font-size: 1.4rem;
+  margin: 0 0 1rem;
+}
+
+.control-section {
+  margin-bottom: 1.4rem;
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.control-section:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0.5rem;
+}
+
+.control-section h2 {
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 0.6rem;
+  color: var(--text-muted);
+}
+
+.control-label {
+  display: block;
+  font-size: 0.82rem;
+  margin: 0.5rem 0 0.25rem;
+  color: var(--text-muted);
+}
+
+.controls input[type="text"],
+.controls select {
+  width: 100%;
+  padding: 0.35rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+  background: #151720;
+  color: var(--text-main);
+  font-size: 0.85rem;
+}
+
+.controls input[type="file"] {
+  width: 100%;
+  font-size: 0.8rem;
+  margin-bottom: 0.25rem;
+}
+
+.controls input[type="color"] {
+  width: 52px;
+  height: 26px;
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+  background: #151720;
+  padding: 0;
+  cursor: pointer;
+}
+
+.controls input[type="range"] {
+  width: 100%;
+}
+
+.color-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  margin: 0.25rem 0;
+}
+
+.small-note {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0.15rem 0 0.5rem;
+}
+
+details {
+  margin: 0.25rem 0;
+  padding: 0.3rem 0.4rem;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+details summary {
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--text-main);
+  outline: none;
+}
+
+.controls button {
+  margin-top: 0.4rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+  background: #1f2230;
+  color: var(--text-main);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.controls button:hover {
+  background: #262a3a;
+}
+
+/* Preview */
+
+.preview {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 1.5rem 1.5rem;
+  overflow: hidden;
+}
+
+.preview-header {
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.preview-header-main h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.preview-header-main p {
+  margin: 0.2rem 0 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.view-tabs {
+  display: inline-flex;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.view-tab {
+  border: none;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-muted);
+  outline: none;
+  font-family: inherit;
+}
+
+.view-tab.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-main);
+}
+
+.view-tab:not(.active):hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sheet {
+  flex: 1;
+  border-radius: 12px;
+  background: radial-gradient(circle at top, #2f343f 0, #14161d 45%, #050609 100%);
+  border: 1px solid var(--border-subtle);
+  padding: 1rem;
+  overflow: auto;
+}
+
+/* Cards container – flex layout normally (grid only for export) */
+
+.sheet-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0 auto;
+  justify-content: flex-start;
+}
+
+/* Cards */
+
+.card {
+  background: var(--card-front-bg);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  position: relative;
+  overflow: hidden;
+  padding: 0.3rem;
+  font-family: var(--label-font);
+
+  flex: 0 0 auto;
+  width: var(--card-width, 120px);
+  aspect-ratio: 2.5 / 3.5;
+}
+
+/* When showing the back side */
+.card.back-view {
+  background: var(--card-back-bg);
+}
+
+/* Per-suit color variables */
+
+.card[data-suit="hearts"] {
+  --this-suit-color: var(--suit-color-hearts);
+}
+
+.card[data-suit="diamonds"] {
+  --this-suit-color: var(--suit-color-diamonds);
+}
+
+.card[data-suit="clubs"] {
+  --this-suit-color: var(--suit-color-clubs);
+}
+
+.card[data-suit="spades"] {
+  --this-suit-color: var(--suit-color-spades);
+}
+
+/* Joker default color */
+.card[data-suit="joker"] {
+  --this-suit-color: #000000;
+}
+
+.card-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* Corners */
+
+.corner {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: calc(var(--corner-rank-font-rem) * var(--card-scale) * 1rem);
+  line-height: 1.1;
+  color: var(--this-suit-color);
+}
+
+.corner-top {
+  top: 0.2rem;
+  left: 0.2rem;
+}
+
+.corner-bottom {
+  bottom: 0.2rem;
+  right: 0.2rem;
+  transform: rotate(180deg);
+}
+
+.rank {
+  font-weight: 700;
+}
+
+.suit-symbol {
+  font-size: calc(var(--corner-rank-font-rem) * var(--card-scale) * 1rem);
+}
+
+.suit-symbol img {
+  max-width: 0.9em;
+  max-height: 0.9em;
+  display: block;
+}
+
+/* Center */
+
+.card-center {
+  position: absolute;
+  inset: var(--center-inset-percent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.center-suit {
+  /* non-ace center uses 80% of ace size */
+  font-size: calc(var(--center-ace-font-rem) * 0.8 * var(--card-scale) * 1rem);
+  color: var(--this-suit-color);
+}
+
+/* Ace uses full ace size */
+.center-ace {
+  font-size: calc(var(--center-ace-font-rem) * var(--card-scale) * 1rem);
+}
+
+.card-center img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* Number card pip layout (2–10) */
+
+.pip-layout {
+  position: absolute;
+  inset: 0;
+}
+
+.pip {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(var(--pip-font-rem) * var(--card-scale) * 1rem);
+  color: var(--this-suit-color);
+  transform: translate(-50%, -50%);
+}
+
+.pip img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* Face card artwork frame */
+
+.face-frame {
+  width: calc(100% - 2 * var(--face-frame-margin));
+  height: calc(100% - 2 * var(--face-frame-margin));
+  border-radius: var(--face-frame-radius);
+  border: calc(2px * var(--card-scale)) solid rgba(0, 0, 0, 0.25);
+  background: rgba(0, 0, 0, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Tint the frame border with the suit color */
+.card[data-suit="hearts"] .face-frame {
+  border-color: var(--suit-color-hearts);
+}
+.card[data-suit="diamonds"] .face-frame {
+  border-color: var(--suit-color-diamonds);
+}
+.card[data-suit="clubs"] .face-frame {
+  border-color: var(--suit-color-clubs);
+}
+.card[data-suit="spades"] .face-frame {
+  border-color: var(--suit-color-spades);
+}
+
+.face-frame img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* Card back face */
+
+.card-back {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--card-radius);
+  border: calc(2px * var(--card-scale)) solid rgba(255, 255, 255, 0.45);
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.2), transparent 55%),
+    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.2), transparent 55%),
+    repeating-linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.18) 0,
+      rgba(255, 255, 255, 0.18) 2px,
+      transparent 2px,
+      transparent 6px
+    );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Scrollbars */
+
+.sheet::-webkit-scrollbar,
+.controls::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sheet::-webkit-scrollbar-thumb,
+.controls::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 3px;
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+  .app {
+    flex-direction: column;
+  }
+
+  .controls {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+    max-height: 60vh;
+  }
+
+  .preview {
+    padding-top: 0.75rem;
+  }
+}
