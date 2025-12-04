@@ -2,291 +2,306 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Playing Card Uncut Sheet Generator</title>
+  <title>Uncut Playing Card Sheet Generator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <link rel="stylesheet" href="style.css" />
-
-  <!-- html2canvas for PNG export -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="script.js" defer></script>
 </head>
 <body>
-  <div class="app">
-    <aside class="controls">
-      <h1>Playing Card Uncut Sheet</h1>
+    <div class="app">
 
-      <!-- Typography -->
-      <section class="control-section">
-        <h2>Typography</h2>
+      <!-- Setting -->
+      <aside class="controls">
+        <h1>Uncut Sheet Generator</h1>
 
-        <label class="control-label" for="fontSelect">Base font</label>
-        <select id="fontSelect">
-          <option value="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
-            System UI
-          </option>
-          <option value="'Times New Roman', serif">Times New Roman</option>
-          <option value="'Georgia', serif">Georgia</option>
-          <option value="'Courier New', monospace">Courier New</option>
-        </select>
+        <!-- Export -->
+        <section class="control-section">
+          <h2>Export</h2>
+          <p class="small-note">
+            Export two PNG sheets (6×9): one for fronts, one for backs.
+          </p>
+          <button type="button" id="exportSheetsBtn">
+            Export 6×9 sheets (front &amp; back)
+          </button>
+        </section>
+        
+        <!-- Typography -->
+        <section class="control-section">
+          <h2>Typography</h2>
+          <label class="control-label" for="fontSelect">Preset font</label>
+          <select id="fontSelect">
+            <option value="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+              System UI
+            </option>
+            <option value="'Georgia', 'Times New Roman', serif">Serif (Georgia)</option>
+            <option value="'Courier New', monospace">Monospace (Courier New)</option>
+            <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+            <option value="'Verdana', sans-serif">Verdana</option>
+          </select>
 
-        <label class="control-label" for="fontCustom">
-          Custom font-family (CSS syntax)
-        </label>
-        <input
-          id="fontCustom"
-          type="text"
-          placeholder="e.g. 'Comic Sans MS', cursive"
-        />
-        <p class="small-note">
-          Make sure the font is installed or loaded via @font-face / Google Fonts.
-        </p>
-      </section>
+          <label class="control-label" for="fontCustom">
+            Custom font-family (overrides preset)
+          </label>
+          <input
+            id="fontCustom"
+            type="text"
+            placeholder="e.g. 'Playfair Display', serif"
+          />
+        </section>
 
-      <!-- Card Colors -->
-      <section class="control-section">
-        <h2>Card Colors</h2>
+        <!-- Card Sizes -->
+        <section class="control-section">
+          <h2>Card Size</h2>
 
-        <label class="control-label" for="frontCardColor">
-          Front card color
-        </label>
-        <input id="frontCardColor" type="color" value="#ffffff" />
+          <label class="control-label" for="cardWidthMm">
+              Card width (mm)
+          </label>
+          <input
+              id="cardWidthMm"
+              type="number"
+              min="30"
+              max="100"
+              step="0.5"
+              value="63"
+          />
 
-        <label class="control-label" for="backCardColor">
-          Back card color
-        </label>
-        <input id="backCardColor" type="color" value="#0044aa" />
-      </section>
+          <label class="control-label" for="cardDpi">
+              Print DPI
+          </label>
+          <select id="cardDpi">
+              <option value="72" selected>72 dpi</option>
+              <option value="96">96 dpi</option>
+              <option value="150">150 dpi</option>
+              <option value="300">300 dpi (print)</option>
+              <option value="600">600 dpi (high-res)</option>
+          </select>
+        </section>
 
-      <!-- Suit Colors -->
-      <section class="control-section">
-        <h2>Suit Colors</h2>
-        <div class="color-row">
-          <span>Hearts</span>
-          <input id="color-hearts" type="color" value="#d32f2f" />
-        </div>
-        <div class="color-row">
-          <span>Diamonds</span>
-          <input id="color-diamonds" type="color" value="#e53935" />
-        </div>
-        <div class="color-row">
-          <span>Clubs</span>
-          <input id="color-clubs" type="color" value="#1a237e" />
-        </div>
-        <div class="color-row">
-          <span>Spades</span>
-          <input id="color-spades" type="color" value="#000000" />
-        </div>
-      </section>
+        <!-- Font Sizes -->
+        <section class="control-section">
+          <h2>Font Sizes</h2>
 
-      <!-- Suit Icons -->
-      <section class="control-section">
-        <h2>Suit Icons</h2>
-        <p class="small-note">
-          Optional SVG/PNG icons used for suits (corners &amp; pips).
-        </p>
-        <details>
-          <summary>Hearts</summary>
+          <label class="control-label" for="fontCornerRankSize">
+              Rank &amp; corner suit size (rem)
+          </label>
+          <input
+              id="fontCornerRankSize"
+              type="range"
+              min="1"
+              max="20.0"
+              step="0.5"
+              value="6"
+          />
+
+          <label class="control-label" for="fontAceCenterSize">
+              Ace &amp; center suit size (rem)
+          </label>
+          <input
+              id="fontAceCenterSize"
+              type="range"
+              min="1"
+              max="60.0"
+              step="0.1"
+              value="35"
+          />
+
+          <label class="control-label" for="fontPipSize">
+              Pip size (rem)
+          </label>
+          <input
+              id="fontPipSize"
+              type="range"
+              min="1"
+              max="30.0"
+              step="0.1"
+              value="10"
+          />
+        </section>
+
+        <!-- Card Background -->
+        <section class="control-section">
+            <h2>Card Colors</h2>
+
+            <label class="control-label" for="frontCardColor">
+              Front card color
+            </label>
+            <input id="frontCardColor" type="color" value="#ffffff" />
+
+            <label class="control-label" for="backCardColor">
+              Back card color
+            </label>
+            <input id="backCardColor" type="color" value="#0044aa" />
+        </section>
+
+        <!-- Suit Colors -->
+        <section class="control-section">
+          <h2>Suit Colors</h2>
+
+          <div class="color-row">
+            <span>Hearts</span>
+            <input
+              id="color-hearts"
+              type="color"
+              value="#d32f2f"
+            />
+          </div>
+          <div class="color-row">
+            <span>Diamonds</span>
+            <input
+              id="color-diamonds"
+              type="color"
+              value="#e53935"
+            />
+          </div>
+          <div class="color-row">
+            <span>Clubs</span>
+            <input
+              id="color-clubs"
+              type="color"
+              value="#1a237e"
+            />
+          </div>
+          <div class="color-row">
+            <span>Spades</span>
+            <input
+              id="color-spades"
+              type="color"
+              value="#000000"
+            />
+          </div>
+        </section>
+
+        <!-- Suit Icons -->
+        <section class="control-section">
+          <h2>Suit Icons (SVG/PNG)</h2>
+          <p class="small-note">
+            Optional – overrides the default ♥ ♦ ♣ ♠ symbols.
+          </p>
+
+          <label class="control-label">Hearts icon</label>
           <input type="file" accept=".svg,.png,.jpg,.jpeg" data-suit-icon="hearts" />
-        </details>
-        <details>
-          <summary>Diamonds</summary>
+
+          <label class="control-label">Diamonds icon</label>
           <input type="file" accept=".svg,.png,.jpg,.jpeg" data-suit-icon="diamonds" />
-        </details>
-        <details>
-          <summary>Clubs</summary>
+
+          <label class="control-label">Clubs icon</label>
           <input type="file" accept=".svg,.png,.jpg,.jpeg" data-suit-icon="clubs" />
-        </details>
-        <details>
-          <summary>Spades</summary>
+
+          <label class="control-label">Spades icon</label>
           <input type="file" accept=".svg,.png,.jpg,.jpeg" data-suit-icon="spades" />
-        </details>
-      </section>
+        </section>
 
-      <!-- Face Images (J, Q, K, Jokers) -->
-      <section class="control-section">
-        <h2>Face Images</h2>
-        <p class="small-note">
-          Upload artwork for J / Q / K and Jokers. Shown inside the face frame.
-        </p>
+        <!-- Face Frame Settings -->
+        <section class="control-section">
+          <h2>Face Frame & Center</h2>
+          <p class="small-note">
+            Adjust the artwork rectangle and the size of the card center area.
+          </p>
 
-        <details>
-          <summary>Hearts (J / Q / K)</summary>
-          <label class="control-label">Jack</label>
-          <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="hearts:J" />
-          <label class="control-label">Queen</label>
-          <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="hearts:Q" />
-          <label class="control-label">King</label>
-          <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="hearts:K" />
-        </details>
+          <label class="control-label" for="faceMargin">
+            Frame margin (px)
+          </label>
+          <input
+            id="faceMargin"
+            type="range"
+            min="0"
+            max="24"
+            step="1"
+            value="4"
+          />
 
-        <details>
-          <summary>Diamonds (J / Q / K)</summary>
-          <label class="control-label">Jack</label>
-          <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="diamonds:J" />
-          <label class="control-label">Queen</label>
-          <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="diamonds:Q" />
-          <label class="control-label">King</label>
-          <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="diamonds:K" />
-        </details>
+          <label class="control-label" for="faceRadius">
+            Frame corner radius (px)
+          </label>
+          <input
+            id="faceRadius"
+            type="range"
+            min="0"
+            max="24"
+            step="1"
+            value="8"
+          />
 
-        <details>
-          <summary>Clubs (J / Q / K)</summary>
-          <label class="control-label">Jack</label>
-          <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="clubs:J" />
-          <label class="control-label">Queen</label>
-          <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="clubs:Q" />
-          <label class="control-label">King</label>
-          <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="clubs:K" />
-        </details>
+          <label class="control-label" for="centerInsetPercent">
+            Card-center inset (% from edges)
+          </label>
+          <input
+            id="centerInsetPercent"
+            type="range"
+            min="5"
+            max="40"
+            step="1"
+            value="18"
+          />
+        </section>
 
-        <details>
-          <summary>Spades (J / Q / K)</summary>
-          <label class="control-label">Jack</label>
-          <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="spades:J" />
-          <label class="control-label">Queen</label>
-          <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="spades:Q" />
-          <label class="control-label">King</label>
-          <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="spades:K" />
-        </details>
+        <!-- Face Images -->
+        <section class="control-section">
+          <h2>Face Images (J / Q / K)</h2>
+          <p class="small-note">
+            Per suit &amp; rank. If set, the center of that card will show your image.
+          </p>
 
-        <details>
-          <summary>Jokers</summary>
-          <label class="control-label">Joker 1</label>
-          <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="joker:JOKER-1" />
-          <label class="control-label">Joker 2</label>
-          <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="joker:JOKER-2" />
-        </details>
-      </section>
+          <details open>
+            <summary>Hearts faces</summary>
+            <label class="control-label">Jack of Hearts</label>
+            <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="hearts:J" />
 
-      <!-- Face Frame & Center -->
-      <section class="control-section">
-        <h2>Face Frame &amp; Center</h2>
-        <p class="small-note">
-          Adjust the artwork rectangle and the size of the card center area.
-        </p>
+            <label class="control-label">Queen of Hearts</label>
+            <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="hearts:Q" />
 
-        <label class="control-label" for="faceMargin">
-          Frame margin (px)
-        </label>
-        <input
-          id="faceMargin"
-          type="range"
-          min="0"
-          max="24"
-          step="1"
-          value="0"
-        />
+            <label class="control-label">King of Hearts</label>
+            <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="hearts:K" />
+          </details>
 
-        <label class="control-label" for="faceRadius">
-          Frame corner radius (px)
-        </label>
-        <input
-          id="faceRadius"
-          type="range"
-          min="0"
-          max="24"
-          step="1"
-          value="0"
-        />
+          <details>
+            <summary>Diamonds faces</summary>
+            <label class="control-label">Jack of Diamonds</label>
+            <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="diamonds:J" />
 
-        <label class="control-label" for="centerInsetPercent">
-          Card-center inset (% from edges)
-        </label>
-        <input
-          id="centerInsetPercent"
-          type="range"
-          min="5"
-          max="40"
-          step="1"
-          value="18"
-        />
-      </section>
+            <label class="control-label">Queen of Diamonds</label>
+            <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="diamonds:Q" />
 
-      <!-- Card Size -->
-      <section class="control-section">
-        <h2>Card Size</h2>
+            <label class="control-label">King of Diamonds</label>
+            <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="diamonds:K" />
+          </details>
 
-        <label class="control-label" for="cardWidthMm">
-          Card width (mm)
-        </label>
-        <input
-          id="cardWidthMm"
-          type="number"
-          min="30"
-          max="100"
-          step="0.5"
-          value="63"
-        />
+          <details>
+            <summary>Clubs faces</summary>
+            <label class="control-label">Jack of Clubs</label>
+            <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="clubs:J" />
 
-        <label class="control-label" for="cardDpi">
-          Print DPI
-        </label>
-        <select id="cardDpi">
-          <option value="72" selected>72 dpi</option>
-          <option value="96">96 dpi</option>
-          <option value="150">150 dpi</option>
-          <option value="300">300 dpi</option>
-          <option value="600">600 dpi</option>
-        </select>
+            <label class="control-label">Queen of Clubs</label>
+            <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="clubs:Q" />
 
-        <p class="small-note">
-          Width in pixels = mm / 25.4 × DPI · height auto-scales (2.5:3.5).
-        </p>
-      </section>
+            <label class="control-label">King of Clubs</label>
+            <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="clubs:K" />
+          </details>
 
-      <!-- Font Sizes -->
-      <section class="control-section">
-        <h2>Font Sizes</h2>
+          <details>
+              <summary>Spades faces</summary>
+              <label class="control-label">Jack of Spades</label>
+              <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="spades:J" />
 
-        <label class="control-label" for="fontCornerRankSize">
-          Rank &amp; corner suit size (rem)
-        </label>
-        <input
-          id="fontCornerRankSize"
-          type="range"
-          min="0.2"
-          max="40"
-          step="0.1"
-          value="6"
-        />
+              <label class="control-label">Queen of Spades</label>
+              <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="spades:Q" />
 
-        <label class="control-label" for="fontAceCenterSize">
-          Ace &amp; center suit size (rem)
-        </label>
-        <input
-          id="fontAceCenterSize"
-          type="range"
-          min="0.5"
-          max="60"
-          step="0.5"
-          value="35"
-        />
+              <label class="control-label">King of Spades</label>
+              <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="spades:K" />
+          </details>
 
-        <label class="control-label" for="fontPipSize">
-          Pip size (rem)
-        </label>
-        <input
-          id="fontPipSize"
-          type="range"
-          min="0.5"
-          max="40"
-          step="0.5"
-          value="10"
-        />
-      </section>
+          <details>
+              <summary>Jokers</summary>
+              <label class="control-label">Joker 1</label>
+              <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="joker:JOKER-1" />
 
-      <!-- Export -->
-      <section class="control-section">
-        <h2>Export</h2>
-        <p class="small-note">
-          Export two PNG sheets (6×9): one for fronts, one for backs.
-        </p>
-        <button type="button" id="exportSheetsBtn">
-          Export 6×9 sheets (front &amp; back)
-        </button>
-      </section>
-    </aside>
+              <label class="control-label">Joker 2</label>
+              <input type="file" accept=".svg,.png,.jpg,.jpeg" data-face="joker:JOKER-2" />
+          </details>
+
+        </section>
+      </aside>
 
     <main class="preview">
       <div class="preview-header">
@@ -307,8 +322,8 @@
         </div>
       </div>
 
+      <!-- This is the important part -->
       <div id="sheet" class="sheet"></div>
     </main>
-  </div>
 </body>
 </html>
