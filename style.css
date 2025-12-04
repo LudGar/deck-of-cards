@@ -16,23 +16,21 @@
   --text-main: #f5f5f5;
   --text-muted: #a9a9b8;
 
+  --corner-rank-font-rem: 0.7;
+  --center-ace-font-rem: 2.6;
+  --pip-font-rem: 1.2;
+
+  --center-inset-percent: 18%;
+
   --card-radius: 10px;
   --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 
   /* Face frame settings (configurable) */
-  --face-frame-margin: 0px;
-  --face-frame-radius: 0px;
+  --face-frame-margin: 4px;
+  --face-frame-radius: 8px;
 
-  /* Card scale factor for fonts based on mm/DPI */
+  /* NEW: card scale factor for fonts based on mm/DPI */
   --card-scale: 1;
-
-  /* Font size configuration (in rem, before scaling) */
-  --corner-rank-font-rem: 6;
-  --center-ace-font-rem: 35;
-  --pip-font-rem: 10;
-
-  /* Card center sizing */
-  --center-inset-percent: 18%;
 }
 
 /* Layout */
@@ -64,7 +62,7 @@ body {
 /* Controls */
 
 .controls {
-  width: 340px;
+  width: 320px;
   max-width: 100%;
   padding: 1.25rem 1.5rem 2rem;
   background: linear-gradient(180deg, #23252f 0%, #171922 100%);
@@ -163,21 +161,6 @@ details summary {
   outline: none;
 }
 
-.controls button {
-  margin-top: 0.4rem;
-  padding: 0.4rem 0.6rem;
-  border-radius: 4px;
-  border: 1px solid var(--border-subtle);
-  background: #1f2230;
-  color: var(--text-main);
-  font-size: 0.85rem;
-  cursor: pointer;
-}
-
-.controls button:hover {
-  background: #262a3a;
-}
-
 /* Preview */
 
 .preview {
@@ -244,7 +227,7 @@ details summary {
   overflow: auto;
 }
 
-/* Cards container – flex layout normally (grid only for export) */
+/* Cards container – fixed card size, wrapping when space runs out */
 
 .sheet-inner {
   display: flex;
@@ -270,10 +253,10 @@ details summary {
   aspect-ratio: 2.5 / 3.5;
 }
 
-/* When showing the back side */
 .card.back-view {
   background: var(--card-back-bg);
 }
+
 
 /* Per-suit color variables */
 
@@ -293,15 +276,33 @@ details summary {
   --this-suit-color: var(--suit-color-spades);
 }
 
-/* Joker default color */
-.card[data-suit="joker"] {
-  --this-suit-color: #000000;
-}
-
 .card-inner {
   width: 100%;
   height: 100%;
   position: relative;
+}
+
+/* Card back face */
+
+.card-back {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--card-radius);
+  border: calc(2px * var(--card-scale)) solid rgba(255, 255, 255, 0.45);
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.2), transparent 55%),
+    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.2), transparent 55%),
+    repeating-linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.18) 0,
+      rgba(255, 255, 255, 0.18) 2px,
+      transparent 2px,
+      transparent 6px
+    );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
 /* Corners */
@@ -328,7 +329,7 @@ details summary {
 }
 
 .rank {
-  font-weight: 700;
+  font-size: calc(var(--corner-rank-font-rem) * var(--card-scale) * 1rem);
 }
 
 .suit-symbol {
@@ -336,8 +337,8 @@ details summary {
 }
 
 .suit-symbol img {
-  max-width: 0.9em;
-  max-height: 0.9em;
+  max-width: calc(0.9rem * var(--card-scale));
+  max-height: calc(0.9rem * var(--card-scale));
   display: block;
 }
 
@@ -352,14 +353,12 @@ details summary {
 }
 
 .center-suit {
-  /* non-ace center uses 80% of ace size */
   font-size: calc(var(--center-ace-font-rem) * 0.8 * var(--card-scale) * 1rem);
   color: var(--this-suit-color);
 }
-
-/* Ace uses full ace size */
 .center-ace {
   font-size: calc(var(--center-ace-font-rem) * var(--card-scale) * 1rem);
+  color: var(--this-suit-color);
 }
 
 .card-center img {
@@ -367,8 +366,6 @@ details summary {
   max-height: 100%;
   object-fit: contain;
 }
-
-/* Number card pip layout (2–10) */
 
 .pip-layout {
   position: absolute;
@@ -392,7 +389,6 @@ details summary {
 }
 
 /* Face card artwork frame */
-
 .face-frame {
   width: calc(100% - 2 * var(--face-frame-margin));
   height: calc(100% - 2 * var(--face-frame-margin));
@@ -419,33 +415,14 @@ details summary {
   border-color: var(--suit-color-spades);
 }
 
+.card[data-suit="joker"] {
+  --this-suit-color: #000000;
+}
+
 .face-frame img {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-}
-
-/* Card back face */
-
-.card-back {
-  width: 100%;
-  height: 100%;
-  border-radius: var(--card-radius);
-  border: calc(2px * var(--card-scale)) solid rgba(255, 255, 255, 0.45);
-  background:
-    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.2), transparent 55%),
-    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.2), transparent 55%),
-    repeating-linear-gradient(
-      45deg,
-      rgba(255, 255, 255, 0.18) 0,
-      rgba(255, 255, 255, 0.18) 2px,
-      transparent 2px,
-      transparent 6px
-    );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
 }
 
 /* Scrollbars */
@@ -459,6 +436,19 @@ details summary {
 .controls::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.22);
   border-radius: 3px;
+}
+
+
+
+  .controls button {
+  margin-top: 0.4rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+  background: #1f2230;
+  color: var(--text-main);
+  font-size: 0.85rem;
+  cursor: pointer;
 }
 
 /* Responsive */
@@ -475,6 +465,9 @@ details summary {
     max-height: 60vh;
   }
 
+  .controls button:hover {
+    background: #262a3a;
+  }
   .preview {
     padding-top: 0.75rem;
   }
