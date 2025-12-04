@@ -1,54 +1,70 @@
 document.addEventListener("DOMContentLoaded", () => {
   const suits = [
-    { id: "hearts", name: "Hearts", symbol: "♥" },
+    { id: "hearts",   name: "Hearts",   symbol: "♥" },
     { id: "diamonds", name: "Diamonds", symbol: "♦" },
-    { id: "clubs", name: "Clubs", symbol: "♣" },
-    { id: "spades", name: "Spades", symbol: "♠" }
+    { id: "clubs",    name: "Clubs",    symbol: "♣" },
+    { id: "spades",   name: "Spades",   symbol: "♠" }
   ];
 
-  const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+  const ranks = [
+    "A",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "J",
+    "Q",
+    "K"
+  ];
 
   const state = {
-    fontFamily:
-      "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-    frontCardColor: "#ffffff",
-    backCardColor: "#0044aa",
+    fontFamily:          "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    frontCardColor:      "#ffffff",
+    backCardColor:       "#0044aa",
     suits: {
-      hearts: { color: "#d32f2f", icon: null },
+      hearts:   { color: "#d32f2f", icon: null },
       diamonds: { color: "#e53935", icon: null },
-      clubs: { color: "#1a237e", icon: null },
-      spades: { color: "#000000", icon: null }
+      clubs:    { color: "#1a237e", icon: null },
+      spades:   { color: "#000000", icon: null }
     },
     // faces[suitId][rank] = dataURL
     faces: {
-      hearts: {},
+      hearts:   {},
       diamonds: {},
-      clubs: {},
-      spades: {},
-      joker: {} // joker artwork
+      clubs:    {},
+      spades:   {},
+      joker:    {}
     },
+
     // Face frame settings
     faceFrame: {
-      marginPx: 0,
-      radiusPx: 0
+      marginPx: 4,
+      radiusPx: 8
     },
+
     // Card physical sizing
     cardWidthMm: 63,
     cardDpi: 72,
+
     // Font scaling (in rem, multiplied by card-scale)
     fontSizes: {
       cornerRank: 6,
       centerAce: 35,
       pip: 10
     },
+
     // Center area inset (% from edges)
     centerInsetPercent: 18,
+
     // View mode: "front" | "back"
     view: "front"
   };
 
-  // Pip layout templates for number cards (approx. standard layouts)
-  // Coordinates are percentages inside the card-center area (0-100).
   const pipTemplates = {
     2: [
       { x: 50, y: 20 },
@@ -159,55 +175,6 @@ document.addEventListener("DOMContentLoaded", () => {
     sheetInner.appendChild(card);
   });
 
-  /* === Root-level style sync === */
-
-  function applyRootStyles() {
-    const root = document.documentElement;
-    root.style.setProperty("--label-font", state.fontFamily);
-
-    root.style.setProperty("--card-front-bg", state.frontCardColor);
-    root.style.setProperty("--card-back-bg", state.backCardColor);
-
-    root.style.setProperty("--suit-color-hearts", state.suits.hearts.color);
-    root.style.setProperty("--suit-color-diamonds", state.suits.diamonds.color);
-    root.style.setProperty("--suit-color-clubs", state.suits.clubs.color);
-    root.style.setProperty("--suit-color-spades", state.suits.spades.color);
-
-    root.style.setProperty(
-      "--face-frame-margin",
-      `${state.faceFrame.marginPx}px`
-    );
-    root.style.setProperty(
-      "--face-frame-radius",
-      `${state.faceFrame.radiusPx}px`
-    );
-
-    // mm → px conversion: px = mm / 25.4 * dpi
-    const widthPx = (state.cardWidthMm / 25.4) * state.cardDpi;
-    root.style.setProperty("--card-width", `${widthPx}px`);
-
-    // Scale factor relative to reference size (63mm @ 300dpi)
-    const baseWidthMm = 63;
-    const baseDpi = 300;
-    const baseWidthPx = (baseWidthMm / 25.4) * baseDpi;
-    const scale = widthPx / baseWidthPx;
-    const safeScale = Math.max(0.3, Math.min(scale, 4));
-    root.style.setProperty("--card-scale", safeScale.toString());
-
-    // Font sizes
-    root.style.setProperty("--corner-rank-font-rem", state.fontSizes.cornerRank);
-    root.style.setProperty("--center-ace-font-rem", state.fontSizes.centerAce);
-    root.style.setProperty("--pip-font-rem", state.fontSizes.pip);
-
-    // Center inset
-    root.style.setProperty(
-      "--center-inset-percent",
-      state.centerInsetPercent + "%"
-    );
-  }
-
-  /* === Download helper === */
-
   function triggerDownload(canvas, filename) {
     const link = document.createElement("a");
     link.href = canvas.toDataURL("image/png");
@@ -215,6 +182,105 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  }
+
+  async function exportSheets6x9() {
+    if (typeof html2canvas === "undefined") {
+      alert("html2canvas is not loaded. Check the script tag in index.html.");
+      return;
+    }
+
+    const sheetElement = document.getElementById("sheet");
+    if (!sheetElement) return;
+
+    const prevView = state.view;
+
+    // Save current layout styles of sheetInner
+    const prevDisplay = sheetInner.style.display;
+    const prevGridTemplate = sheetInner.style.gridTemplateColumns;
+    const prevGap = sheetInner.style.gap;
+    const prevMargin = sheetInner.style.margin;
+    const prevJustify = sheetInner.style.justifyContent;
+
+    // Force 6×9 grid layout for export with no outer spacing
+    sheetElement.scrollTop = 0;
+    sheetElement.scrollLeft = 0;
+    sheetInner.style.display = "grid";
+    sheetInner.style.gridTemplateColumns = "repeat(6, auto)";
+    sheetInner.style.gap = "0";
+    sheetInner.style.margin = "0";          // remove centering margin
+    sheetInner.style.justifyContent = "start";
+
+    try {
+      // FRONT SHEET
+      state.view = "front";
+      updateCards();
+
+      const canvasFront = await html2canvas(sheetInner, {
+        backgroundColor: null,
+        scale: 2
+      });
+      triggerDownload(canvasFront, "deck-front-6x9.png");
+
+      // BACK SHEET
+      state.view = "back";
+      updateCards();
+
+      const canvasBack = await html2canvas(sheetInner, {
+        backgroundColor: null,
+        scale: 2
+      });
+      triggerDownload(canvasBack, "deck-back-6x9.png");
+    } catch (err) {
+      console.error("[Export 6x9] Error during export:", err);
+      alert("Export failed. Check the console for details.");
+    } finally {
+      // Restore previous view and layout
+      state.view = prevView;
+      updateCards();
+
+      sheetInner.style.display = prevDisplay;
+      sheetInner.style.gridTemplateColumns = prevGridTemplate;
+      sheetInner.style.gap = prevGap;
+      sheetInner.style.margin = prevMargin;
+      sheetInner.style.justifyContent = prevJustify;
+    }
+  }
+
+  /* === Root-level style sync === */
+
+  function applyRootStyles() {
+
+    const root = document.documentElement;
+    const widthPx = (state.cardWidthMm / 25.4) * state.cardDpi;
+
+    const baseWidthMm = 63;
+    const baseDpi = 300;
+    const baseWidthPx = (baseWidthMm / 25.4) * baseDpi;
+    const scale = widthPx / baseWidthPx;
+    const safeScale = Math.max(0.3, Math.min(scale, 4));
+
+    root.style.setProperty("--label-font",            state.fontFamily);
+    root.style.setProperty("--card-front-bg",         state.frontCardColor);
+    root.style.setProperty("--card-back-bg",          state.backCardColor);
+
+    root.style.setProperty("--suit-color-hearts",     state.suits.hearts.color);
+    root.style.setProperty("--suit-color-diamonds",   state.suits.diamonds.color);
+    root.style.setProperty("--suit-color-clubs",      state.suits.clubs.color);
+    root.style.setProperty("--suit-color-spades",     state.suits.spades.color);
+
+    root.style.setProperty("--face-frame-margin",  `${state.faceFrame.marginPx}px`);
+    root.style.setProperty("--face-frame-radius",  `${state.faceFrame.radiusPx}px`);
+
+    root.style.setProperty("--card-width",         `${widthPx}px`);
+    root.style.setProperty("--card-scale",            safeScale.toString());
+
+    root.style.setProperty("--corner-rank-font-rem",  state.fontSizes.cornerRank);
+    root.style.setProperty("--center-ace-font-rem",   state.fontSizes.centerAce);
+    root.style.setProperty("--pip-font-rem",          state.fontSizes.pip);
+
+    // Center inset
+    root.style.setProperty("--center-inset-percent",  state.centerInsetPercent + "%");
   }
 
   /* === Rendering helpers === */
@@ -225,17 +291,18 @@ document.addEventListener("DOMContentLoaded", () => {
     center.className = "card-center";
 
     if (isJoker) {
-      // Joker front: corners + frame, optional image
       const cornerTop = document.createElement("div");
       cornerTop.className = "corner corner-top";
+
       const cornerBottom = document.createElement("div");
       cornerBottom.className = "corner corner-bottom";
 
-      const labelText = "JOKER";
+      const labelText = "J";
 
       const rankTop = document.createElement("div");
       rankTop.className = "rank";
       rankTop.textContent = labelText;
+
       const suitTop = document.createElement("div");
       suitTop.className = "suit-symbol";
       suitTop.textContent = "★";
@@ -246,6 +313,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const rankBottom = document.createElement("div");
       rankBottom.className = "rank";
       rankBottom.textContent = labelText;
+
       const suitBottom = document.createElement("div");
       suitBottom.className = "suit-symbol";
       suitBottom.textContent = "★";
@@ -266,12 +334,10 @@ document.addEventListener("DOMContentLoaded", () => {
       if (faceImg) {
         const img = document.createElement("img");
         img.src = faceImg;
-        img.alt = "Joker";
         frame.appendChild(img);
       } else {
         const label = document.createElement("div");
         label.className = "center-suit";
-        label.textContent = "JOKER";
         frame.appendChild(label);
       }
 
@@ -292,17 +358,21 @@ document.addEventListener("DOMContentLoaded", () => {
     // Corners
     const cornerTop = document.createElement("div");
     cornerTop.className = "corner corner-top";
+
     const rankTop = document.createElement("div");
     rankTop.className = "rank";
     rankTop.textContent = rank;
+
     const suitTop = document.createElement("div");
     suitTop.className = "suit-symbol";
 
     const cornerBottom = document.createElement("div");
     cornerBottom.className = "corner corner-bottom";
+
     const rankBottom = document.createElement("div");
     rankBottom.className = "rank";
     rankBottom.textContent = rank;
+
     const suitBottom = document.createElement("div");
     suitBottom.className = "suit-symbol";
 
@@ -352,7 +422,7 @@ document.addEventListener("DOMContentLoaded", () => {
         img.className = "center-suit center-ace";
         center.appendChild(img);
       } else {
-        const span = document.createElement("span");
+        const span =          document.createElement("span");
         span.className = "center-suit center-ace";
         span.textContent = suitDef.symbol;
         center.appendChild(span);
@@ -363,15 +433,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const template = pipTemplates[numericRank];
 
       if (template && template.length > 0) {
-        const layout = document.createElement("div");
+        const layout =        document.createElement("div");
         layout.className = "pip-layout";
 
         template.forEach((pos) => {
-          const pip = document.createElement("span");
+          const pip =         document.createElement("span");
           pip.className = "pip";
 
           if (suitSettings && suitSettings.icon) {
-            const img = document.createElement("img");
+            const img =       document.createElement("img");
             img.src = suitSettings.icon;
             img.alt = `${suitDef.name} icon`;
             pip.appendChild(img);
@@ -389,13 +459,13 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         // Fallback / safety: single center symbol
         if (suitSettings && suitSettings.icon) {
-          const img = document.createElement("img");
+          const img =         document.createElement("img");
           img.src = suitSettings.icon;
           img.alt = `${suitDef.name} icon`;
           img.className = "center-suit";
           center.appendChild(img);
         } else {
-          const span = document.createElement("span");
+          const span =        document.createElement("span");
           span.className = "center-suit";
           span.textContent = suitDef.symbol;
           center.appendChild(span);
@@ -405,7 +475,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderCardBack(cardInner) {
-    const back = document.createElement("div");
+    const back =              document.createElement("div");
     back.className = "card-back";
     // No text label – just the pattern
     cardInner.appendChild(back);
@@ -421,12 +491,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const suitId = card.dataset.suit;
       const rank = card.dataset.rank;
 
+      // Toggle front/back background class
       const isBack = state.view === "back";
       card.classList.toggle("back-view", isBack);
 
       // Clear and rebuild inner
       card.innerHTML = "";
-      const inner = document.createElement("div");
+      const inner =           document.createElement("div");
       inner.className = "card-inner";
       card.appendChild(inner);
 
@@ -438,70 +509,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /* === Export 6×9 === */
-
-  async function exportSheets6x9() {
-    if (typeof html2canvas === "undefined") {
-      alert("html2canvas is not loaded. Check the script tag in index.html.");
-      return;
-    }
-
-    const sheetElement = document.getElementById("sheet");
-    if (!sheetElement) return;
-
-    const prevView = state.view;
-
-    // Save current layout styles
-    const prevDisplay = sheetInner.style.display;
-    const prevGridTemplate = sheetInner.style.gridTemplateColumns;
-    const prevGap = sheetInner.style.gap;
-
-    // Force 6×9 grid layout for export
-    sheetElement.scrollTop = 0;
-    sheetElement.scrollLeft = 0;
-    sheetInner.style.display = "grid";
-    sheetInner.style.gridTemplateColumns = "repeat(6, auto)";
-    sheetInner.style.gap = "0";
-
-    try {
-      // FRONT SHEET
-      state.view = "front";
-      updateCards();
-
-      const canvasFront = await html2canvas(sheetElement, {
-        backgroundColor: null,
-        scale: 2
-      });
-      triggerDownload(canvasFront, "deck-front-6x9.png");
-
-      // BACK SHEET
-      state.view = "back";
-      updateCards();
-
-      const canvasBack = await html2canvas(sheetElement, {
-        backgroundColor: null,
-        scale: 2
-      });
-      triggerDownload(canvasBack, "deck-back-6x9.png");
-    } catch (err) {
-      console.error("[Export 6x9] Error during export:", err);
-      alert("Export failed. Check the console for details.");
-    } finally {
-      // Restore previous view and layout
-      state.view = prevView;
-      updateCards();
-
-      sheetInner.style.display = prevDisplay;
-      sheetInner.style.gridTemplateColumns = prevGridTemplate;
-      sheetInner.style.gap = prevGap;
-    }
-  }
-
   /* === Controls wiring === */
 
   // Font controls
-  const fontSelect = document.getElementById("fontSelect");
-  const fontCustom = document.getElementById("fontCustom");
+  const fontSelect =          document.getElementById("fontSelect");
+  const fontCustom =          document.getElementById("fontCustom");
 
   function updateFont() {
     const custom = fontCustom.value.trim();
@@ -516,33 +528,29 @@ document.addEventListener("DOMContentLoaded", () => {
   fontSelect.addEventListener("change", updateFont);
   fontCustom.addEventListener("input", updateFont);
 
-  // Card colors
-  const frontCardColor = document.getElementById("frontCardColor");
-  if (frontCardColor) {
-    frontCardColor.addEventListener("input", (e) => {
-      state.frontCardColor = e.target.value;
-      updateCards();
-    });
-  }
+  // Front side color
+  const frontCardColor =      document.getElementById("frontCardColor");
+  frontCardColor.addEventListener("input", (e) => {
+    state.frontCardColor = e.target.value;
+    updateCards();
+  });
 
-  const backCardColor = document.getElementById("backCardColor");
-  if (backCardColor) {
-    backCardColor.addEventListener("input", (e) => {
-      state.backCardColor = e.target.value;
-      updateCards();
-    });
-  }
+  // Back side color
+  const backCardColor =       document.getElementById("backCardColor");
+  backCardColor.addEventListener("input", (e) => {
+    state.backCardColor = e.target.value;
+    updateCards();
+  });
 
   // Suit colors
   const colorInputs = {
-    hearts: document.getElementById("color-hearts"),
-    diamonds: document.getElementById("color-diamonds"),
-    clubs: document.getElementById("color-clubs"),
-    spades: document.getElementById("color-spades")
+    hearts:                   document.getElementById("color-hearts"),
+    diamonds:                 document.getElementById("color-diamonds"),
+    clubs:                    document.getElementById("color-clubs"),
+    spades:                   document.getElementById("color-spades")
   };
 
   Object.entries(colorInputs).forEach(([suitId, input]) => {
-    if (!input) return;
     input.addEventListener("input", (e) => {
       state.suits[suitId].color = e.target.value;
       updateCards();
@@ -550,7 +558,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Suit icon file inputs
-  const suitIconInputs = document.querySelectorAll("[data-suit-icon]");
+  const suitIconInputs =      document.querySelectorAll("[data-suit-icon]");
   suitIconInputs.forEach((input) => {
     const suitId = input.dataset.suitIcon;
     input.addEventListener("change", (e) => {
@@ -566,7 +574,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Face image file inputs (including jokers)
-  const faceInputs = document.querySelectorAll("[data-face]");
+  const faceInputs =          document.querySelectorAll("[data-face]");
   faceInputs.forEach((input) => {
     const [suitId, rank] = input.dataset.face.split(":");
     input.addEventListener("change", (e) => {
@@ -583,8 +591,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Face frame controls
-  const faceMargin = document.getElementById("faceMargin");
-  const faceRadius = document.getElementById("faceRadius");
+  const faceMargin =          document.getElementById("faceMargin");
+  const faceRadius =          document.getElementById("faceRadius");
 
   if (faceMargin) {
     faceMargin.addEventListener("input", (e) => {
@@ -601,8 +609,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Card size controls: mm & DPI
-  const cardWidthMmInput = document.getElementById("cardWidthMm");
-  const cardDpiSelect = document.getElementById("cardDpi");
+  const cardWidthMmInput =    document.getElementById("cardWidthMm");
+  const cardDpiSelect =       document.getElementById("cardDpi");
 
   if (cardWidthMmInput) {
     cardWidthMmInput.addEventListener("input", (e) => {
@@ -625,9 +633,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Font size controls (merged rank + corner, ace/center, pips)
-  const cornerRankSize = document.getElementById("fontCornerRankSize");
-  const centerAceSize = document.getElementById("fontAceCenterSize");
-  const pipSize = document.getElementById("fontPipSize");
+  const cornerRankSize =      document.getElementById("fontCornerRankSize");
+  const centerAceSize =       document.getElementById("fontAceCenterSize");
+  const pipSize =             document.getElementById("fontPipSize");
 
   if (cornerRankSize) {
     cornerRankSize.addEventListener("input", (e) => {
@@ -651,7 +659,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Center inset slider
-  const insetInput = document.getElementById("centerInsetPercent");
+  const insetInput =          document.getElementById("centerInsetPercent");
   if (insetInput) {
     insetInput.addEventListener("input", (e) => {
       state.centerInsetPercent = parseFloat(e.target.value);
@@ -659,8 +667,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Export 6×9 sheets (front & back)
+  const exportBtn =           document.getElementById("exportSheetsBtn");
+  if (exportBtn) {
+    exportBtn.addEventListener("click", () => {
+      exportSheets6x9();
+    });
+  }
+
+
   // View tabs (front/back)
-  const viewTabs = document.querySelectorAll(".view-tab");
+  const viewTabs =            document.querySelectorAll(".view-tab");
   viewTabs.forEach((btn) => {
     btn.addEventListener("click", () => {
       const view = btn.dataset.view === "back" ? "back" : "front";
@@ -673,14 +690,6 @@ document.addEventListener("DOMContentLoaded", () => {
       updateCards();
     });
   });
-
-  // Export 6×9 sheets (front & back)
-  const exportBtn = document.getElementById("exportSheetsBtn");
-  if (exportBtn) {
-    exportBtn.addEventListener("click", () => {
-      exportSheets6x9();
-    });
-  }
 
   // Initial render
   updateCards();
