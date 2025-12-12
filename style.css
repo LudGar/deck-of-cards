@@ -257,7 +257,6 @@ details summary {
   background: var(--card-back-bg);
 }
 
-
 /* Per-suit color variables */
 
 .card[data-suit="hearts"] {
@@ -403,6 +402,7 @@ details summary {
 }
 
 /* Face card artwork frame */
+
 .face-frame {
   width: calc(100% - 2 * var(--face-frame-margin));
   height: calc(100% - 2 * var(--face-frame-margin));
@@ -421,6 +421,7 @@ details summary {
 }
 
 /* also override the colored border variants */
+
 .card[data-suit="hearts"] .face-frame.face-frame-has-image,
 .card[data-suit="diamonds"] .face-frame.face-frame-has-image,
 .card[data-suit="clubs"] .face-frame.face-frame-has-image,
@@ -451,9 +452,7 @@ details summary {
   border-radius: 3px;
 }
 
-
-
-  .controls button {
+.controls button {
   margin-top: 0.4rem;
   padding: 0.4rem 0.6rem;
   border-radius: 4px;
