@@ -303,6 +303,7 @@ details summary {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  z-index: 1;
 }
 
 /* Corners */
@@ -315,6 +316,7 @@ details summary {
   font-size: calc(var(--corner-rank-font-rem) * var(--card-scale) * 1rem);
   line-height: 1.1;
   color: var(--this-suit-color);
+  z-index: 3;
 }
 
 .corner-top {
@@ -337,8 +339,8 @@ details summary {
 }
 
 .suit-symbol img {
-  max-width: calc(0.9rem * var(--card-scale));
-  max-height: calc(0.9rem * var(--card-scale));
+  max-width: 1em;
+  max-height: 1em;
   display: block;
 }
 
@@ -350,21 +352,33 @@ details summary {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.center-suit {
-  font-size: calc(var(--center-ace-font-rem) * 0.8 * var(--card-scale) * 1rem);
-  color: var(--this-suit-color);
-}
-.center-ace {
-  font-size: calc(var(--center-ace-font-rem) * var(--card-scale) * 1rem);
-  color: var(--this-suit-color);
+  z-index: 1;
 }
 
 .card-center img {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
+}
+
+.center-suit {
+  font-size: calc(var(--center-ace-font-rem) * 0.8 * var(--card-scale) * 1rem);
+  color: var(--this-suit-color);
+}
+
+.center-suit img {
+  width: 1em;
+  height: 1em;
+}
+
+.center-ace {
+  font-size: calc(var(--center-ace-font-rem) * var(--card-scale) * 1rem);
+  color: var(--this-suit-color);
+}
+
+.center-ace img {
+  width: 1em;
+  height: 1em;
 }
 
 .pip-layout {
@@ -383,8 +397,8 @@ details summary {
 }
 
 .pip img {
-  max-width: 100%;
-  max-height: 100%;
+  max-width: 1em;
+  max-height: 1em;
   object-fit: contain;
 }
 
@@ -401,18 +415,17 @@ details summary {
   overflow: hidden;
 }
 
-/* Tint the frame border with the suit color */
-.card[data-suit="hearts"] .face-frame {
-  border-color: var(--suit-color-hearts);
+.face-frame-has-image {
+  border: none !important;
+  background: transparent !important;
 }
-.card[data-suit="diamonds"] .face-frame {
-  border-color: var(--suit-color-diamonds);
-}
-.card[data-suit="clubs"] .face-frame {
-  border-color: var(--suit-color-clubs);
-}
-.card[data-suit="spades"] .face-frame {
-  border-color: var(--suit-color-spades);
+
+/* also override the colored border variants */
+.card[data-suit="hearts"] .face-frame.face-frame-has-image,
+.card[data-suit="diamonds"] .face-frame.face-frame-has-image,
+.card[data-suit="clubs"] .face-frame.face-frame-has-image,
+.card[data-suit="spades"] .face-frame.face-frame-has-image {
+  border: none !important;
 }
 
 .card[data-suit="joker"] {
