@@ -332,12 +332,15 @@ document.addEventListener("DOMContentLoaded", () => {
       frame.className = "face-frame";
 
       if (faceImg) {
+        frame.classList.add("face-frame-has-image");
         const img = document.createElement("img");
         img.src = faceImg;
+        img.alt = "Joker";
         frame.appendChild(img);
       } else {
         const label = document.createElement("div");
         label.className = "center-suit";
+        label.textContent = "JOKER";
         frame.appendChild(label);
       }
 
@@ -406,6 +409,7 @@ document.addEventListener("DOMContentLoaded", () => {
       frame.className = "face-frame";
 
       if (faceImg) {
+        frame.classList.add("face-frame-has-image");
         const img = document.createElement("img");
         img.src = faceImg;
         img.alt = `${rank} of ${suitDef.name}`;
@@ -481,6 +485,34 @@ document.addEventListener("DOMContentLoaded", () => {
     cardInner.appendChild(back);
   }
 
+  function updateAspectInfo() {
+    const aspectEl = document.getElementById("aspectInfo");
+    if (!aspectEl) return;
+
+    // Prefer a face frame; fallback to any card-inner if none exist
+    const frame =
+      document.querySelector(".card .face-frame") ||
+      document.querySelector(".card-inner");
+
+    if (!frame) {
+      aspectEl.textContent = "Face frame aspect: –";
+      return;
+    }
+
+    const rect = frame.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) {
+      aspectEl.textContent = "Face frame aspect: –";
+      return;
+    }
+
+    const ratio = rect.width / rect.height;
+    const roundedRatio = ratio.toFixed(3);
+
+    aspectEl.textContent =
+      `Face frame approx aspect: ${roundedRatio} (width / height), ` +
+      `${Math.round(rect.width)} × ${Math.round(rect.height)} px`;
+  }
+
   /* === Master update === */
 
   function updateCards() {
@@ -491,13 +523,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const suitId = card.dataset.suit;
       const rank = card.dataset.rank;
 
-      // Toggle front/back background class
       const isBack = state.view === "back";
       card.classList.toggle("back-view", isBack);
 
       // Clear and rebuild inner
       card.innerHTML = "";
-      const inner =           document.createElement("div");
+      const inner = document.createElement("div");
       inner.className = "card-inner";
       card.appendChild(inner);
 
@@ -507,7 +538,11 @@ document.addEventListener("DOMContentLoaded", () => {
         renderCardFront(inner, suitId, rank);
       }
     });
+
+    // Let the browser layout, then measure
+    requestAnimationFrame(updateAspectInfo);
   }
+
 
   /* === Controls wiring === */
 
